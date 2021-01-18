@@ -15,7 +15,7 @@
 //#define MD5_SIZE		16
 //#define MD5_STR_LEN		32
 
-extern const unsigned long READ_DATA_SIZE = 1000000;
+extern const unsigned long READ_DATA_SIZE = 8192;
 extern const unsigned short MD5_SIZE = 16;
 extern const unsigned short MD5_STR_LEN = 32;
 
@@ -44,8 +44,7 @@ int main(int argc, char *argv[])
     }
     img_reader.close();
     for (auto p=repeat_set.begin(); p != repeat_set.end(); ++p){
-        printf((*p).c_str());
-        printf("\n");
+        printf("%s\n", (*p).c_str());
         //std::cout << *p + "\n"; 
     }
 	return 0;
@@ -57,7 +56,9 @@ void Check_in_map(const std::string& true_md5_str, const std::string& file_path,
         repeat_set.insert((*pt).second);
         repeat_set.insert(file_path);
     }
-    md5_container.insert(std::pair<std::string, std::string>(true_md5_str, file_path));
+    else {
+        md5_container.insert(std::pair<std::string, std::string>(true_md5_str, file_path));
+    }
 }
 
 /**
@@ -69,7 +70,7 @@ void Check_in_map(const std::string& true_md5_str, const std::string& file_path,
 std::string Compute_file_md5(const char *file_path, char *md5_str)
 {
 	int fd;
-	int ret;
+	unsigned int ret;
 	unsigned char data[READ_DATA_SIZE];
 	unsigned char md5_value[MD5_SIZE];
 	MD5_CTX md5;
@@ -108,7 +109,7 @@ std::string Compute_file_md5(const char *file_path, char *md5_str)
 	MD5Final(&md5, md5_value);
 
 	// convert md5 value to md5 string
-	for(int i = 0; i < MD5_SIZE; i++)
+	for(unsigned short i = 0; i < MD5_SIZE; ++i)
 	{
 		snprintf(md5_str + i*2, 2+1, "%02x", md5_value[i]);
 	}
